@@ -1,0 +1,49 @@
+{
+  "name": "akibtanjim/virtual-classroom",
+  "description": "Laravel Virtual Classroom using Braincert Virtual Classroom API.",
+  "keywords": [
+    "laravel",
+    "virtual",
+    "classroom",
+    "braincert",
+    "virtual classroom",
+    "white board",
+    "video",
+    "meeting",
+    "video conference",
+    "online classroom",
+    "virtual classroom api"
+  ],
+  "type": "library",
+  "require": {
+    "php": ">=5.4",
+    "ixudra/curl": "^6.19"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "akibtanjim",
+      "email": "akibtanjim@gmail.com"
+    }, {
+      "name": "Alveee",
+      "email": "zahid.alvee@gmail.com"
+    }, {
+      "name": "LutfullahilKabirAshik",
+      "email": "lutfullahilkabir@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "extra": {
+    "laravel": {
+      "providers": ["AkibTanjim\\VirtualClassRoom\\VirtualClassRoomServiceProvider"],
+      "aliases": {
+        "ClassRoom": "AkibTanjim\\VirtualClassRoom\\Facades\\ClassRoom"
+      }
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "AkibTanjim\\VirtualClassRoom\\": "src"
+    }
+  }
+}
