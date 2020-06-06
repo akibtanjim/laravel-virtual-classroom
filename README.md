@@ -10,7 +10,7 @@ Install using composer:
 
 ```
 
-composer require akibtanjim/virtual-classroom
+composer require akibtanjim/virtual-classroom-api
 
 ```
 
