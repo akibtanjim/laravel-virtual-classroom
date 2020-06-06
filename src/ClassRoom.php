@@ -85,7 +85,7 @@ class ClassRoom
      *  Pretty Format Validation Error Response
      *
      * @param  array  $errors
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     private static function validationErrorsResponseHandler($errors)
     {
@@ -101,7 +101,7 @@ class ClassRoom
      *
      * @param  array  $data
      * @param  string  $message
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     private static function successResponseHandler($data, $message)
     {
@@ -115,9 +115,9 @@ class ClassRoom
      *  Method Type : Private
      *  Pretty Format Custom Error Response
      *
-     * @param  array  $data
      * @param  string  $message
-     * @return json
+     * @param  int $statusCode
+     * @return \Illuminate\Http\JsonResponse
      */
     private static function customErrorResponse($message, $statusCode)
     {
@@ -141,7 +141,7 @@ class ClassRoom
      *  Schedule A Class
      *
      * @param  array  $data
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function schedule($data)
     {
@@ -173,12 +173,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($data, 'schedule');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if ($responseData["status"] === 'ok') {
-                return self::successResponseHandler($responseData, "Class scheduled successfully");
-            } else {
-                return self::customErrorResponse($responseData["error"], 400);
-            }
+            return self::generateResponse($response, "Class scheduled successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -189,7 +184,7 @@ class ClassRoom
      *  Fetch All Classes
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function classList($request)
     {
@@ -205,12 +200,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'listclass');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if (array_key_exists('status', $responseData) && $responseData["status"] === 'error') {
-                return self::customErrorResponse($responseData["error"], 400);
-            } else {
-                return self::successResponseHandler($responseData, "Class list fetched successfully");
-            }
+            return self::generateResponse($response, "Class list fetched successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -221,7 +211,7 @@ class ClassRoom
      *  Remove A Class
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function removeClass($request)
     {
@@ -234,12 +224,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'removeclass');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if ($responseData["status"] === 'ok') {
-                return self::successResponseHandler($responseData, "Class removed successfully");
-            } else {
-                return self::customErrorResponse($responseData["error"], 400);
-            }
+            return self::generateResponse($response, "Class removed successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -250,7 +235,7 @@ class ClassRoom
      *  Cancel A Class
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function cancelClass($request)
     {
@@ -264,13 +249,8 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'cancelclass');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if ($responseData["status"] === 'ok') {
-                $message = $request['is_cancel'] == 0 ? 'activated' : 'cancelled';
-                return self::successResponseHandler($responseData, "Class " . $message . " successfully");
-            } else {
-                return self::customErrorResponse($responseData["error"], 400);
-            }
+            $status =  $request['is_cancel'] == 0 ? 'activated' : 'cancelled';
+            return self::generateResponse($response, "Class $status successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -281,7 +261,7 @@ class ClassRoom
      *  Generate A Class Url
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function launchClass($request)
     {
@@ -300,12 +280,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'getclasslaunch');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if ($responseData["status"] === 'ok') {
-                return self::successResponseHandler($responseData, "Class launched successfully");
-            } else {
-                return self::customErrorResponse($responseData["error"], 400);
-            }
+            return self::generateResponse($response, "Class launched successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -326,7 +301,7 @@ class ClassRoom
      *  Attach A Pricing Scheme To A Class
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function addScheme($request)
     {
@@ -343,12 +318,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'addSchemes');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if ($responseData["status"] === 'ok') {
-                return self::successResponseHandler($responseData, "Price Scheme added successfully");
-            } else {
-                return self::customErrorResponse($responseData["error"], 400);
-            }
+            return self::generateResponse($response, "Price Scheme added successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -359,7 +329,7 @@ class ClassRoom
      *  Get All Pricing Scheme
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function schemeList($request)
     {
@@ -372,12 +342,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'listSchemes');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if (array_key_exists('status', $responseData) && $responseData["status"] === 'error') {
-                return self::customErrorResponse($responseData["error"], 400);
-            } else {
-                return self::successResponseHandler($responseData, "Schemes fetched successfully");
-            }
+            return self::generateResponse($response, "Schemes fetched successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -388,7 +353,7 @@ class ClassRoom
      *  Remove A Pricing Scheme
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function removeScheme($request)
     {
@@ -401,12 +366,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'removeprice');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if ($responseData["status"] === 'ok') {
-                return self::successResponseHandler($responseData, "Scheme removed successfully");
-            } else {
-                return self::customErrorResponse($responseData["error"], 400);
-            }
+            return self::generateResponse($response, "Scheme removed successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -417,7 +377,7 @@ class ClassRoom
      *  Payment Process For A Class
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function payment($request)
     {
@@ -453,12 +413,7 @@ class ClassRoom
             ];
             $api_url = env('BRAIN_CERT_BASE_URL') . '/v2/apiclasspayment';
             $response = Curl::to($api_url)->withData($request_data)->asJson()->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if ($responseData[0]["status"] === "ok") {
-                return self::successResponseHandler($responseData, "Payment processed successfully");
-            } else {
-                return self::customErrorResponse($responseData[0]["error"], 400);
-            }
+            return self::generateResponse($response, "Payment processed successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -480,7 +435,7 @@ class ClassRoom
      *  Create Discount With OR Without Coupon
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function addDiscount($request)
     {
@@ -499,12 +454,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'addSpecials');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if ($responseData["status"] === 'ok') {
-                return self::successResponseHandler($responseData, "Discount added successfully");
-            } else {
-                return self::customErrorResponse($responseData["error"], 400);
-            }
+            return self::generateResponse($response, "Discount added successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -515,7 +465,7 @@ class ClassRoom
      *  Get All Discounts
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function discountList($request)
     {
@@ -529,12 +479,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'listdiscount');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if (array_key_exists('status', $responseData) && $responseData["status"] === 'error') {
-                return self::customErrorResponse($responseData["error"], 400);
-            } else {
-                return self::successResponseHandler($responseData, "Discount list fetched successfully");
-            }
+            return self::generateResponse($response, "Discount List fetched successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -545,7 +490,7 @@ class ClassRoom
      *  Remove Discount For A Specific Discount
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function removeDiscount($request)
     {
@@ -558,12 +503,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'removediscount');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if ($responseData["status"] === 'ok') {
-                return self::successResponseHandler($responseData, "Discount removed successfully");
-            } else {
-                return self::customErrorResponse($responseData["error"], 400);
-            }
+            return self::generateResponse($response, "Discount removed successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -574,7 +514,7 @@ class ClassRoom
      *  Apply Coupon To A Class
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function applyCoupon($request)
     {
@@ -588,12 +528,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'applycoupon');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if (array_key_exists('status', $responseData) && $responseData["status"] === 'error') {
-                return self::customErrorResponse($responseData["error"], 400);
-            } else {
-                return self::successResponseHandler($responseData, "Discount coupon applied successfully");
-            }
+            return self::generateResponse($response, "Discount coupon applied successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -615,7 +550,7 @@ class ClassRoom
      *  Get All Class Recordings
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function recordingList($request)
     {
@@ -629,12 +564,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'getclassrecording');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if (array_key_exists('status', $responseData) && $responseData["status"] === 'error') {
-                return self::customErrorResponse($responseData["error"], 400);
-            } else {
-                return self::successResponseHandler($responseData, "Recording list fetched successfully");
-            }
+            return self::generateResponse($response, "Recording list fetched successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -645,7 +575,7 @@ class ClassRoom
      *  Get Details Of A Single Recording
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function getRecording($request)
     {
@@ -658,12 +588,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'getrecording');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if (array_key_exists('status', $responseData) && $responseData["status"] === 'error') {
-                return self::customErrorResponse($responseData["error"], 400);
-            } else {
-                return self::successResponseHandler($responseData, "Recording fetched successfully");
-            }
+            return self::generateResponse($response, "Recording fetched successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -674,7 +599,7 @@ class ClassRoom
      *  Remove A Class Recording
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function removeRecording($request)
     {
@@ -687,12 +612,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'removeclassrecording');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if (array_key_exists('status', $responseData) && $responseData["status"] === 'error') {
-                return self::customErrorResponse($responseData["error"], 400);
-            } else {
-                return self::successResponseHandler($responseData, "Recording removed successfully");
-            }
+            return self::generateResponse($response, "Recording removed successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -703,7 +623,7 @@ class ClassRoom
      *  Change Status Of A Recording
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function changeRecordingStatus($request)
     {
@@ -716,12 +636,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'changestatusrecording');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if (array_key_exists('status', $responseData) && $responseData["status"] === 'error') {
-                return self::customErrorResponse($responseData["error"], 400);
-            } else {
-                return self::successResponseHandler($responseData, "Recording status changed successfully");
-            }
+            return self::generateResponse($response, "Recording status changed successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -743,7 +658,7 @@ class ClassRoom
      *  Get Class Usage/Engagement Report
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function classUsageReport($request)
     {
@@ -758,12 +673,7 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'getclassreport');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if (array_key_exists('status', $responseData) && $responseData["status"] === 'error') {
-                return self::customErrorResponse($responseData["error"], 400);
-            } else {
-                return self::successResponseHandler($responseData, "Class usage report fetched successfully");
-            }
+            return self::generateResponse($response, "Class usage report fetched successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
@@ -771,10 +681,10 @@ class ClassRoom
     }
     /**
      *  Method Type : public
-     *  Get Atteneds Of A Class
+     *  Get Attendees Of A Class
      *
      * @param  array  $request
-     * @return json
+     * @return \Illuminate\Http\JsonResponse
      */
     public static function getAttendees($request)
     {
@@ -787,15 +697,29 @@ class ClassRoom
             }
             $api_url = self::getRequestUrl($request, 'availableAttendees');
             $response = Curl::to($api_url)->withContentType('application/json')->post();
-            $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
-            if (array_key_exists('status', $responseData) && $responseData["status"] === 'error') {
-                return self::customErrorResponse($responseData["error"], 400);
-            } else {
-                return self::successResponseHandler($responseData, "Available attendees list fetched successfully");
-            }
+            return self::generateResponse($response, "Available attendees list fetched successfully");
         } catch (\Exception $e) {
             Log::error($e);
             return self::customErrorResponse("Internal Error", 500);
         }
+    }
+
+    /**
+     * Return custom response based on response data
+     *
+     * @param $response
+     * @param string $successMessage
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private static function generateResponse($response, $successMessage)
+    {
+        $responseData = gettype($response) !== "object" ? json_decode($response, true) : (array) $response;
+        if (array_key_exists('status', $responseData) && $responseData["status"] === 'error') {
+            $customResponse = self::customErrorResponse($responseData["error"], 400);
+        } else {
+            $customResponse = self::successResponseHandler($responseData, $successMessage);
+        }
+
+        return $customResponse;
     }
 }
